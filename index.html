@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Multi-step Income Statement Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: University of New Haven course material, same frame as the other labs.
+   Frozen navy header over a frozen parts timeline; the part card and the student's income statement on the left;
+   the adjusted trial balance (where accounts are classified and placed) on the right. */
+:root{
+  --navy:#002D74; --gold:#FFC629;
+  --paper:#eff2f7; --sheet:#ffffff; --ink:#111b2e; --muted:#56617a; --rule:#d8dfea; --rule-strong:#a9b6cc;
+  --brand:#002D74; --brand-soft:#e3e9f4;
+  --mast-bg:#002D74; --mast-ink:#ffffff; --mast-muted:#c9d4ea;
+  --hl:#fff1bf; --hl-ink:#3a2e00;
+  --gold-ink:#8a6100; --gold-soft:#fcefc7;
+  --slate:#4b5670; --slate-soft:#e6e9f0;
+  --good:#1b7a46; --good-soft:#dcf1e4; --bad:#b3261e; --bad-soft:#fbe2df;
+  --field:#ffffff;
+  --shadow:0 1px 2px rgba(0,25,70,.07),0 6px 18px rgba(0,25,70,.05);
+  --f-display:"Barlow Semi Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Sans 3","Source Sans Pro","Helvetica Neue",Arial,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --b1:0px; --b2:0px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#08101f; --sheet:#0f1a2e; --ink:#e6ebf5; --muted:#9aa7c0; --rule:#22304b; --rule-strong:#3a4b6e;
+  --brand:#8fb1f0; --brand-soft:#16264a;
+  --mast-bg:#001c4a; --mast-ink:#ffffff; --mast-muted:#b6c3df;
+  --hl:rgba(255,198,41,.2); --hl-ink:#ffe7a3;
+  --gold-ink:#FFC629; --gold-soft:#2e2508;
+  --slate:#b3bdd4; --slate-soft:#1e2840;
+  --good:#62d396; --good-soft:#123020; --bad:#ff8d82; --bad-soft:#3a1715;
+  --field:#0a1426;
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 6px 18px rgba(0,0,0,.3);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#08101f; --sheet:#0f1a2e; --ink:#e6ebf5; --muted:#9aa7c0; --rule:#22304b; --rule-strong:#3a4b6e;
+  --brand:#8fb1f0; --brand-soft:#16264a;
+  --mast-bg:#001c4a; --mast-ink:#ffffff; --mast-muted:#b6c3df;
+  --hl:rgba(255,198,41,.2); --hl-ink:#ffe7a3;
+  --gold-ink:#FFC629; --gold-soft:#2e2508;
+  --slate:#b3bdd4; --slate-soft:#1e2840;
+  --good:#62d396; --good-soft:#123020; --bad:#ff8d82; --bad-soft:#3a1715;
+  --field:#0a1426;
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 6px 18px rgba(0,0,0,.3);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.5;padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+.wrap{max-width:1360px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.12}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* Frozen header */
+.band1{background:var(--mast-bg);color:var(--mast-ink);border-bottom:4px solid var(--gold);z-index:6;padding-top:env(safe-area-inset-top,0px)}
+.band1 .wrap{padding-block:12px 12px}
+.b1-row{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:space-between}
+.eyebrow{font-family:var(--f-display);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.band1 h1{font-size:clamp(22px,2.6vw,30px);font-weight:700}
+.biz{flex:1 1 380px;min-width:0;max-width:76ch;font-size:14.5px;color:var(--mast-muted);line-height:1.4;margin:0}
+.biz b{color:var(--mast-ink)}
+.setchip{font-family:var(--f-num);font-size:12.5px;color:var(--mast-muted);border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:5px 10px;white-space:nowrap}
+.setchip b{color:var(--gold);font-weight:600}
+.band2{position:sticky;top:0;z-index:5;background:var(--sheet);border-bottom:1px solid var(--rule);box-shadow:var(--shadow)}
+.band2 .wrap{padding-block:8px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:flex-end;justify-content:space-between}
+@media (min-width:760px){.band1{position:sticky;top:0}.band2{top:var(--b1)}}
+.status{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:13.5px;color:var(--muted)}
+.status b{color:var(--ink)}
+.score{font-size:13px;font-weight:600;background:var(--hl);color:var(--hl-ink);border-radius:999px;padding:2px 10px}
+.legend-dots{display:flex;gap:10px;font-size:12px}
+.legend-dots i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:0}
+.timeline{display:flex;gap:6px;align-items:flex-end;overflow-x:auto;padding:4px 2px 2px;min-width:0;flex:1 1 560px}
+.tick{position:relative;flex:0 0 auto;height:30px;border-radius:4px;border:1px solid var(--rule);background:var(--paper);font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);padding:0 10px;display:inline-flex;align-items:center;gap:6px}
+.tick .n{font-family:var(--f-num);font-size:11.5px}
+.tick.done{background:var(--navy);border-color:var(--navy);color:#fff}
+.tick.cur{outline:2px solid var(--ink);outline-offset:1px}
+.tick:disabled{opacity:.45;cursor:not-allowed}
+.tick.s-first::after,.tick.s-retry::after,.tick.s-shown::after{content:"";position:absolute;top:-4px;right:-4px;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--sheet)}
+.tick.s-first::after{background:var(--good)} .tick.s-retry::after{background:var(--gold)} .tick.s-shown::after{background:var(--muted)}
+.tl-arrow{color:var(--rule-strong);font-size:13px;align-self:center}
+
+/* Grid */
+main{padding-block:18px 40px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px;align-items:start}
+.col{display:grid;gap:18px;min-width:0}
+@media (max-width:1060px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;box-shadow:var(--shadow);min-width:0;overflow:hidden;scroll-margin-top:calc(var(--b1) + var(--b2) + 12px)}
+@media (max-width:759px){.panel{scroll-margin-top:calc(var(--b2) + 12px)}}
+.panel-h{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--rule);border-top:3px solid var(--navy)}
+:root[data-theme="dark"] .panel-h{border-top-color:var(--brand)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .panel-h{border-top-color:var(--brand)}}
+.panel-h h2{font-size:21px;font-weight:700;color:var(--brand)}
+.panel-h .sub{font-size:13.5px;color:var(--muted)}
+.panel-b{padding:14px 16px 16px}
+#pPart .panel-h{border-top-color:var(--gold)}
+.pill{display:inline-block;font-family:var(--f-display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--brand-soft);color:var(--brand)}
+.panel.focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--hl),var(--shadow)}
+
+/* Part card */
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13.5px;color:var(--muted)}
+.part-title{font-size:23px;font-weight:700;margin:10px 0 4px}
+.part-desc{margin:0 0 10px}
+.where{display:flex;gap:8px;align-items:center;background:var(--gold-soft);color:var(--gold-ink);border-radius:8px;padding:8px 12px;font-size:14px;font-weight:600}
+.progress{margin-top:10px;font-size:14px;color:var(--muted)}
+.progress b{color:var(--ink)}
+.overall{margin-top:12px;font-size:14px;border-radius:8px;padding:9px 12px}
+.overall.ok{background:var(--good-soft);color:var(--good)}
+.overall.no{background:var(--bad-soft);color:var(--bad)}
+.overall.shown{background:var(--gold-soft);color:var(--gold-ink)}
+.hintbox{margin-top:12px;font-size:14px;background:var(--gold-soft);color:var(--gold-ink);border-radius:8px;padding:9px 12px}
+.hintbox ol,.hintbox ul{margin:4px 0 0;padding-left:20px}
+.why{margin-top:12px;background:var(--paper);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:10px 12px;font-size:14.5px}
+.why b{font-family:var(--f-display);font-size:16px}
+.fields{display:grid;gap:10px;margin-top:6px}
+.field{border:1px solid var(--rule);border-radius:8px;padding:10px 12px}
+.field.ok{border-color:var(--good);box-shadow:inset 0 0 0 1px var(--good)}
+.field.no{border-color:var(--bad);box-shadow:inset 0 0 0 1px var(--bad)}
+.flabel{font-weight:600;font-size:14.5px;display:block;margin-bottom:6px}
+.field select{width:100%;background:var(--field);border:1px solid var(--rule-strong);border-radius:6px;padding:7px 8px;min-height:38px;font-size:14.5px}
+.fmsg{font-size:13.5px;font-weight:600;display:flex;gap:6px;margin-top:6px}
+.fmsg.ok{color:var(--good)} .fmsg.no{color:var(--bad)}
+.actions{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:16px;padding-top:12px;border-top:1px solid var(--rule);align-items:center;justify-content:space-between}
+.actions .grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.actions .ask{font-size:13.5px;font-weight:600}
+.btn{border:1px solid var(--rule-strong);background:var(--sheet);border-radius:6px;padding:7px 12px;font-size:14.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:36px}
+.btn:hover{background:var(--brand-soft)}
+.btn:disabled{opacity:.4;cursor:default;background:var(--sheet)}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:#0a3d8f}
+.btn.small{font-size:13.5px;padding:5px 10px;min-height:32px}
+.effects{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.eff{font-size:13.5px;font-weight:600;border-radius:6px;padding:4px 9px;border:1px solid var(--rule)}
+.eff.up{background:var(--good-soft);color:var(--good);border-color:transparent}
+.eff.none{color:var(--muted)}
+
+/* Trial balance */
+.scroll{overflow-x:auto}
+table.tb{width:100%;border-collapse:collapse;font-size:14px}
+.tb caption,.st caption{caption-side:top;text-align:center;padding-bottom:10px}
+.cap-firm{font-family:var(--f-display);font-weight:700;font-size:17px;color:var(--brand)}
+.cap-name{font-family:var(--f-display);font-weight:600;font-size:16px}
+.cap-date{font-size:12.5px;color:var(--muted)}
+.tb th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:6px 6px;border-bottom:2px solid var(--rule-strong);text-align:left;white-space:nowrap}
+.tb th.r,.tb td.r{text-align:right}
+.tb td{padding:5px 6px;border-top:1px solid var(--rule);vertical-align:middle}
+.tb td.r{font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tb td.no{font-family:var(--f-num);color:var(--muted);font-size:12px}
+.tb td.nm{font-weight:500;min-width:170px}
+.tb td.pick{width:150px}
+.tb td.pick2{width:200px}
+.tb select{width:100%;background:var(--field);border:1px solid var(--rule-strong);border-radius:6px;padding:4px 6px;min-height:32px;font-size:13.5px}
+.tb tr.ok select{border-color:var(--good);box-shadow:inset 0 0 0 1px var(--good)}
+.tb tr.no select{border-color:var(--bad);box-shadow:inset 0 0 0 1px var(--bad)}
+.tb tr.fb td{border-top:0;padding-top:0}
+.tb .fmsg{margin-top:0}
+.tb .tag{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;white-space:nowrap}
+.tag.IS{background:var(--brand-soft);color:var(--brand)}
+.tag.BS{background:var(--slate-soft);color:var(--slate)}
+.tag.SRE{background:var(--gold-soft);color:var(--gold-ink)}
+.tag.sec{background:var(--paper);color:var(--ink);font-weight:600;white-space:normal;border-radius:6px}
+.tb td.dim{color:var(--muted);font-size:12.5px}
+.tb tfoot td{font-weight:700;border-top:2px solid var(--ink);border-bottom:3px double var(--ink)}
+.tb-note{margin-top:10px;font-size:13.5px;color:var(--muted)}
+.balanced{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--good)}
+@media (max-width:640px){.tb td.pick,.tb td.pick2{width:auto;min-width:150px}}
+
+/* Statement */
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+.st caption{border-bottom:2px solid var(--ink);padding-bottom:8px}
+.st td{padding:4px 4px;vertical-align:bottom}
+.st td.n{text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap;width:96px}
+.st tr.h td{font-weight:700;padding-top:10px}
+.st td.i1{padding-left:18px} .st td.i2{padding-left:34px}
+.st td.ul{border-bottom:1px solid var(--ink)}
+.st td.dul{border-bottom:3px double var(--ink);font-weight:700}
+.st tr.sub td:first-child{font-weight:700}
+.st tr.sub td.lab-muted{color:var(--muted);font-style:italic;font-weight:500}
+.st tr.slot select{width:100%;max-width:290px;background:var(--field);border:1px solid var(--rule-strong);border-radius:6px;padding:4px 6px;min-height:32px;font-size:14px;font-weight:600}
+.st tr.slot.ok select{border-color:var(--good);box-shadow:inset 0 0 0 1px var(--good)}
+.st tr.slot.no select{border-color:var(--bad);box-shadow:inset 0 0 0 1px var(--bad)}
+.st tr.fb td{padding-top:0}
+.st tr.empty td{color:var(--muted);font-style:italic;font-size:13.5px}
+.st-wait{color:var(--muted);font-size:14px;padding:22px 6px;text-align:center}
+.st-note{margin-top:10px;font-size:13.5px;background:var(--paper);border-radius:6px;padding:8px 12px;color:var(--muted)}
+footer{font-size:12.5px;color:var(--muted);padding-block:0 30px}
+</style>
+</head>
+<body>
+
+<header class="band1" id="band1">
+  <div class="wrap">
+    <div class="b1-row">
+      <div>
+        <div class="eyebrow">University of New Haven · Financial Accounting · Chapter 6</div>
+        <h1>Multi-step Income Statement Lab</h1>
+      </div>
+      <p class="biz" id="biz"></p>
+      <div class="setchip" title="Each problem set uses different amounts">Problem set <b id="setNo">—</b></div>
+    </div>
+  </div>
+</header>
+<div class="band2" id="band2">
+  <div class="wrap">
+    <div class="timeline" id="timeline" aria-label="Parts of the lab"></div>
+    <div class="status">
+      <div id="where"></div>
+      <span class="score" id="score" hidden></span>
+      <div class="legend-dots"><span><i style="background:var(--good)"></i>First try</span><span><i style="background:var(--gold)"></i>Retried</span><span><i style="background:var(--muted)"></i>Answer shown</span></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="grid">
+    <div class="col">
+      <section class="panel" id="pPart" aria-labelledby="partH">
+        <div class="panel-h"><h2 id="partH">Your task</h2><span class="sub" id="partSub"></span></div>
+        <div class="panel-b" id="part"></div>
+      </section>
+      <section class="panel" id="pSt" aria-labelledby="stH">
+        <div class="panel-h"><h2 id="stH">Your income statement</h2><span class="sub">The lab does the arithmetic. You decide what goes where.</span></div>
+        <div class="panel-b" id="statement"></div>
+      </section>
+    </div>
+    <section class="panel" id="pTB" aria-labelledby="tbH">
+      <div class="panel-h"><h2 id="tbH">Adjusted trial balance</h2><span class="sub" id="tbSub"></span></div>
+      <div class="panel-b" id="tb"></div>
+    </section>
+  </div>
+</main>
+<footer class="wrap">Problem Solvers, Inc. and all figures are illustrative. Each problem set changes the amounts; the accounts and questions stay the same.</footer>
+
+<script>
+(function(){
+"use strict";
+const YEAR=new Date().getFullYear();
+const KEY="islab1";
+const $=id=>document.getElementById(id);
+function fmt(n){return Math.abs(n).toLocaleString("en-US");}
+function d$(n){return "$"+fmt(n);}
+function money(n,dollar){return (n<0?"(":"")+(dollar?"$":"")+fmt(n)+(n<0?")":"");}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function randomSeed(){return 10000+Math.floor(Math.random()*90000);}
+
+$("biz").innerHTML='<b>Problem Solvers, Inc.</b> finished its first year, '+YEAR+'. It earns consulting revenue and sells “how-to” business guides. Use its adjusted trial balance to build a <b>multi-step income statement</b>.';
+
+// ---------- Accounts (numbers from the course chart of accounts) ----------
+// st: statement (IS, BS, SRE); sec: income statement section; kind: wording used in feedback
+const ACCTS=[
+  {id:"cash",no:1000,name:"Cash",side:"D",st:"BS",kind:"asset"},
+  {id:"ar",no:1100,name:"Accounts Receivable",side:"D",st:"BS",kind:"asset"},
+  {id:"irec",no:1150,name:"Interest Receivable",side:"D",st:"BS",kind:"asset",
+    p1:{IS:"Interest Receivable is the interest the company is owed but has not collected, so it is an asset on the balance sheet. The interest earned for the year is Interest Revenue."}},
+  {id:"ppi",no:1210,name:"Prepaid Insurance",side:"D",st:"BS",kind:"asset",
+    p1:{IS:"Prepaid Insurance is coverage paid for but not used yet, so it is an asset on the balance sheet. The coverage used this year is Insurance Expense."}},
+  {id:"sup",no:1300,name:"Supplies",side:"D",st:"BS",kind:"asset",
+    p1:{IS:"Supplies is the cost of supplies still on hand, an asset on the balance sheet. The supplies used this year are in Supplies Expense."}},
+  {id:"inv",no:1400,name:"Inventory",side:"D",st:"BS",kind:"asset",
+    p1:{IS:"Inventory is the cost of guides still on hand, an asset on the balance sheet. The cost of guides sold is Cost of Goods Sold, which is on the income statement."}},
+  {id:"equip",no:1500,name:"Equipment",side:"D",st:"BS",kind:"asset"},
+  {id:"ad",no:1599,name:"Accumulated Depreciation",side:"C",st:"BS",kind:"contra-asset",
+    p1:{IS:"Accumulated Depreciation is a contra-asset that reduces Equipment on the balance sheet. This year's depreciation is Depreciation Expense, which is on the income statement."}},
+  {id:"ap",no:2000,name:"Accounts Payable",side:"C",st:"BS",kind:"liability"},
+  {id:"wp",no:2020,name:"Wages Payable",side:"C",st:"BS",kind:"liability",
+    p1:{IS:"Wages Payable is the amount still owed to employees, a liability on the balance sheet. The cost of their work for the year is Wages Expense."}},
+  {id:"ip",no:2040,name:"Interest Payable",side:"C",st:"BS",kind:"liability",
+    p1:{IS:"Interest Payable is interest owed but not yet paid, a liability on the balance sheet. The cost of borrowing for the year is Interest Expense."}},
+  {id:"itp",no:2060,name:"Income Tax Payable",side:"C",st:"BS",kind:"liability",
+    p1:{IS:"Income Tax Payable is tax owed but not yet paid, a liability on the balance sheet. The tax for the year is Income Tax Expense."}},
+  {id:"np",no:2500,name:"Notes Payable",side:"C",st:"BS",kind:"liability"},
+  {id:"cs",no:3000,name:"Common Stock",side:"C",st:"BS",kind:"stockholders' equity account",
+    p1:{IS:"Issuing stock is an investment by owners, not revenue. Common Stock is reported in stockholders' equity on the balance sheet.",
+        SRE:"The statement of retained earnings covers earnings kept in the business and dividends. Common Stock is contributed capital, reported in stockholders' equity on the balance sheet."}},
+  {id:"div",no:3200,name:"Dividends",side:"D",st:"SRE",kind:"dividends",
+    p1:{IS:"Dividends are distributions of earnings to owners, not expenses, so they never appear on the income statement. They reduce retained earnings on the statement of retained earnings.",
+        BS:"Dividends is a temporary account. It is reported on the statement of retained earnings, and reaches the balance sheet only through the ending Retained Earnings balance."}},
+  {id:"svc",no:4000,name:"Service Revenue",side:"C",st:"IS",sec:"oprev",kind:"revenue"},
+  {id:"sales",no:4100,name:"Sales Revenue",side:"C",st:"IS",sec:"sales",kind:"revenue"},
+  {id:"sra",no:4110,name:"Sales Returns and Allowances",side:"D",st:"IS",sec:"contra",kind:"contra-revenue",
+    p1:{BS:"Sales Returns and Allowances is a contra-revenue account. It reduces Sales Revenue on the income statement; it is not an asset even though it has a debit balance."}},
+  {id:"intrev",no:4200,name:"Interest Revenue",side:"C",st:"IS",sec:"othrev",kind:"revenue"},
+  {id:"cogs",no:5000,name:"Cost of Goods Sold",side:"D",st:"IS",sec:"cogs",kind:"expense",
+    p1:{BS:"Cost of Goods Sold is the cost of guides that were sold this year, an expense on the income statement. The guides still on hand are in Inventory, on the balance sheet."}},
+  {id:"rent",no:6000,name:"Rent Expense",side:"D",st:"IS",sec:"opex",kind:"expense"},
+  {id:"bank",no:6010,name:"Bank Fee Expense",side:"D",st:"IS",sec:"opex",kind:"expense"},
+  {id:"insx",no:6020,name:"Insurance Expense",side:"D",st:"IS",sec:"opex",kind:"expense"},
+  {id:"supx",no:6030,name:"Supplies Expense",side:"D",st:"IS",sec:"opex",kind:"expense"},
+  {id:"wage",no:6040,name:"Wages Expense",side:"D",st:"IS",sec:"opex",kind:"expense"},
+  {id:"util",no:6050,name:"Utilities Expense",side:"D",st:"IS",sec:"opex",kind:"expense"},
+  {id:"intx",no:6060,name:"Interest Expense",side:"D",st:"IS",sec:"othexp",kind:"expense"},
+  {id:"adv",no:6070,name:"Advertising Expense",side:"D",st:"IS",sec:"opex",kind:"expense"},
+  {id:"tax",no:6080,name:"Income Tax Expense",side:"D",st:"IS",sec:"tax",kind:"expense"},
+  {id:"depx",no:6090,name:"Depreciation Expense",side:"D",st:"IS",sec:"opex",kind:"expense"}
+];
+const A=Object.fromEntries(ACCTS.map(a=>[a.id,a]));
+const IS_ACCTS=ACCTS.filter(a=>a.st==="IS");
+const STMTS=[["IS","Income statement","Income statement"],["BS","Balance sheet","Balance sheet"],["SRE","Statement of retained earnings","Retained earnings stmt."]];
+const SECS=[
+  ["sales","Sales (top line)"],
+  ["contra","Deduction from sales"],
+  ["cogs","Cost of goods sold"],
+  ["oprev","Other operating revenue"],
+  ["opex","Operating expenses"],
+  ["othrev","Other revenue (nonoperating)"],
+  ["othexp","Other expense (nonoperating)"],
+  ["tax","Income tax expense"]
+];
+const SECNAME=Object.fromEntries(SECS);
+const REVSEC=["sales","oprev","othrev"], EXPSEC=["cogs","opex","othexp","tax","contra"];
+const SLOTS=[
+  {id:"ns",ans:"Net sales",desc:"This line is sales revenue minus sales returns and allowances."},
+  {id:"gp",ans:"Gross profit",desc:"This line is net sales minus cost of goods sold, nothing else."},
+  {id:"io",ans:"Income from operations",desc:"This line is the result of the company's main activities: gross profit plus service revenue minus operating expenses, before interest and income tax."},
+  {id:"ibt",ans:"Income before income tax expense",desc:"This line adds the nonoperating items (other revenue and expense) but comes before income tax."},
+  {id:"ni",ans:"Net income",desc:"This is the bottom line, after every expense including income tax."}
+];
+const LABELS=["Net sales","Gross profit","Income from operations","Income before income tax expense","Net income","Total revenues","Total expenses"];
+
+// ---------- Problem generator ----------
+function gen(seed){
+  const r=mulberry32(seed);
+  const R=(a,b,s)=>{s=s||1;return a+s*Math.floor(r()*(Math.floor((b-a)/s)+1));};
+  for(let t=0;t<5000;t++){
+    const v={};
+    v.sales=R(60000,120000,500); v.sra=R(1000,4000,50);
+    const ns=v.sales-v.sra;
+    v.cogs=Math.round(ns*R(52,64)/100/50)*50;
+    v.svc=R(15000,40000,500);
+    v.rent=12*R(800,1500,25); v.bank=R(60,300,10); v.insx=R(1200,3000,100); v.supx=R(600,2000,50);
+    v.wage=R(18000,32000,500); v.util=R(1500,4000,50); v.adv=R(1000,5000,100); v.depx=R(1500,4000,100);
+    v.intrev=R(100,800,10); v.intx=R(300,1500,10);
+    const opex=["rent","bank","insx","supx","wage","util","adv","depx"].reduce((s,k)=>s+v[k],0);
+    const io=ns-v.cogs+v.svc-opex; if(io<8000)continue;
+    const ibt=io+v.intrev-v.intx; if(ibt<=0)continue;
+    v.tax=Math.round(ibt*0.21);
+    const ni=ibt-v.tax;
+    // balance sheet side (first year: Retained Earnings has no balance yet)
+    v.equip=R(20000,50000,1000); v.ad=v.depx; v.np=R(10000,30000,1000);
+    v.ip=R(Math.min(100,v.intx),v.intx,10); v.irec=R(0,v.intrev,10); if(v.irec===0)v.irec=v.intrev;
+    v.itp=R(Math.round(v.tax*0.3),v.tax,1);
+    v.ar=R(3000,12000,100); v.inv=R(4000,15000,100); v.sup=R(200,1200,50); v.ppi=R(300,1500,50);
+    v.ap=R(2000,9000,100); v.wp=R(400,2000,50); v.div=R(1000,Math.max(1000,Math.min(6000,Math.floor(ni/2/500)*500)),500);
+    v.cs=R(40000,90000,5000);
+    let cr=0,dr=0; ACCTS.forEach(a=>{if(a.id==="cash")return;if(a.side==="C")cr+=v[a.id];else dr+=v[a.id];});
+    v.cash=cr-dr; if(v.cash<5000||v.cash>80000)continue;
+    if(ACCTS.some(a=>!Number.isInteger(v[a.id])||v[a.id]<=0))continue;
+    return v;
+  }
+  throw new Error("Could not generate a problem set");
+}
+
+// ---------- Parts ----------
+const PARTS=[
+  {id:"p1",tick:"Classify",title:"Which statement?",
+   desc:"Every account on the adjusted trial balance is reported on one statement. Decide where each one goes.",
+   where:"Use the Statement column in the adjusted trial balance →",
+   hint:'<ul><li>Revenues, contra-revenues, and expenses (including Cost of Goods Sold and Income Tax Expense) measure the year\'s results: <b>income statement</b>.</li><li>Assets, contra-assets, liabilities, and Common Stock: <b>balance sheet</b>.</li><li>Dividends: <b>statement of retained earnings</b>.</li></ul>',
+   why:"Revenues and expenses are temporary accounts that measure one year's performance, so they belong on the income statement. Permanent accounts, which carry into next year, belong on the balance sheet. Dividends are distributions to owners, not expenses, so they appear on the statement of retained earnings."},
+  {id:"p2",tick:"Place",title:"Where on the income statement?",
+   desc:"Place each income statement account in its section. Watch your statement build on the left as you choose.",
+   where:"Use the Section column in the adjusted trial balance →",
+   hint:'<ol><li><b>Sales</b>, then the <b>deduction from sales</b> for returns and allowances → net sales</li><li><b>Cost of goods sold</b> → gross profit</li><li><b>Other operating revenue</b> from the company\'s other main activity, then <b>operating expenses</b> of running the business → income from operations</li><li><b>Other revenue and expense</b> not from main operations, like interest → income before income tax expense</li><li><b>Income tax expense</b> → net income</li></ol>',
+   why:"A multi-step income statement separates the results of buying and selling guides (gross profit) and of all main operations (income from operations) from financing items like interest and from income tax. That lets readers judge each step of the business on its own."},
+  {id:"p3",tick:"Label",title:"Name the subtotals",
+   desc:"The statement has five subtotal lines with no names. Choose the name for each one. Read what has been added and subtracted above each line.",
+   where:"Use the dropdowns in your income statement ←",
+   hint:'Work from the top. Each subtotal takes the one above it one step further: sales less returns → less cost of goods sold → plus service revenue, less operating expenses → plus or minus other items → less income tax.',
+   why:"Each subtotal answers a different question. Net sales: how much did customers actually pay for guides? Gross profit: how much did guides earn above their cost? Income from operations: how profitable are the main activities? Net income: what is left for owners after everything, including taxes?"},
+  {id:"p4",tick:"Read",title:"Read the statement",
+   desc:"Use your finished statement to answer a few questions about what the subtotals tell a reader.",
+   where:null,
+   hint:"Look at where each item sits relative to the subtotals. An item below a subtotal cannot change that subtotal.",
+   why:"Managers, lenders, and investors use the subtotals for different decisions. Gross profit shows pricing and product costs, income from operations shows how well the core business is run, and net income shows the total return to owners.",
+   qs:[
+    {id:"q1",label:"Which subtotal shows how much the guides earned above their cost?",ans:"gp",
+     opts:[["ns","Net sales"],["gp","Gross profit"],["io","Income from operations"],["ni","Net income"]],
+     wrong:{ns:"Net sales is what customers paid after returns and allowances. It doesn't subtract the guides' cost yet.",io:"Income from operations also includes service revenue and operating expenses, not just the guides.",ni:"Net income includes every revenue and expense, not just the guides and their cost."}},
+    {id:"q2",label:"Why is Interest Expense reported below income from operations?",ans:"fin",
+     opts:[["fin","It is a cost of borrowing (financing), not of running the main business"],["cash","It has not been paid in cash yet"],["small","It is smaller than the operating expenses"],["contra","It is a contra-revenue account"]],
+     wrong:{cash:"Placement on the income statement doesn't depend on whether cash has been paid. Accrual accounting records expenses when they are incurred.",small:"Size doesn't decide placement. What matters is whether the item comes from the company's main operations.",contra:"Interest Expense is an expense, not a contra-revenue. The only contra-revenue here is Sales Returns and Allowances."}},
+    {id:"q3",label:"If Problem Solvers had earned more interest revenue, which subtotal would NOT change?",ans:"io",
+     opts:[["io","Income from operations"],["ibt","Income before income tax expense"],["ni","Net income"]],
+     wrong:{ibt:"Interest revenue is added in the other revenue and expense section, right above income before income tax expense, so that line would change.",ni:"Net income is the bottom line, so it changes whenever any revenue or expense above it changes."}},
+    {id:"q4",label:"What does a multi-step income statement show that a single-step statement does not?",ans:"sub",
+     opts:[["sub","Subtotals that separate gross profit and operating results from other items"],["ni","A different net income"],["bs","Assets and liabilities"],["div","Dividends paid to stockholders"]],
+     wrong:{ni:"Both formats report the same net income. Only the arrangement and subtotals differ.",bs:"Assets and liabilities belong on the balance sheet under either format.",div:"Dividends are never on an income statement. They appear on the statement of retained earnings."}}
+   ]}
+];
+
+// ---------- Feedback ----------
+const ST_NAME={IS:"income statement",BS:"balance sheet",SRE:"statement of retained earnings"};
+function p1msg(a,ch){
+  if(a.p1&&a.p1[ch])return a.p1[ch];
+  if(a.st==="BS"){
+    if(ch==="IS")return a.name+" is a"+(/^[aeiou]/.test(a.kind)?"n ":" ")+a.kind+". It is a permanent account that carries into next year, so it is reported on the balance sheet.";
+    return "The statement of retained earnings reports beginning retained earnings, net income, and dividends. "+a.name+" is a"+(/^[aeiou]/.test(a.kind)?"n ":" ")+a.kind+", reported on the balance sheet.";
+  }
+  if(a.st==="IS"){
+    if(ch==="BS")return a.name+" is a"+(/^[aeiou]/.test(a.kind)?"n ":" ")+a.kind+" account. Revenues and expenses measure this year's results, so they are reported on the income statement.";
+    return "The statement of retained earnings shows net income as a single total. Individual revenues and expenses like "+a.name+" are listed on the income statement.";
+  }
+  return "Not quite. Dividends belong on the statement of retained earnings.";
+}
+function p2msg(a,ch){
+  const n=a.name, s=a.sec;
+  if(s==="opex"){
+    if(ch==="cogs")return "Cost of Goods Sold covers only the cost of guides that were sold. "+n+" is a cost of running the business, so it is an operating expense.";
+    if(ch==="othexp")return n+" is a normal cost of day-to-day operations, so it is an operating expense, not a nonoperating item.";
+    if(ch==="contra")return "The deduction from sales is for returns and allowances given to customers. "+n+" is a cost of running the business.";
+    if(ch==="tax")return "Only Income Tax Expense goes on the income tax line. "+n+" is a cost of running the business.";
+    if(REVSEC.includes(ch))return n+" is an expense, so it can't go in a revenue section.";
+  }
+  if(s==="cogs"){
+    if(ch==="opex")return "Cost of Goods Sold gets its own line right after net sales so gross profit can be measured. It isn't grouped with operating expenses.";
+    if(ch==="contra")return "Cost of Goods Sold is the cost of the guides sold, not a reduction of their selling price. It comes after net sales.";
+    if(REVSEC.includes(ch))return "Cost of Goods Sold is an expense, so it can't go in a revenue section.";
+    return "Cost of Goods Sold is part of buying and selling guides, the core of the business. It comes right after net sales.";
+  }
+  if(s==="sales"){
+    if(ch==="contra")return "Sales Revenue is the starting point of the statement. The deduction from sales is for Sales Returns and Allowances.";
+    if(ch==="oprev")return "On a merchandiser's multi-step statement, revenue from selling goods is the top line, so it can be compared with Cost of Goods Sold.";
+    if(ch==="othrev")return "Selling guides is one of the company's main activities, so its revenue is operating revenue at the top of the statement.";
+    return "Sales Revenue is revenue, so it can't go in an expense section.";
+  }
+  if(s==="contra"){
+    if(ch==="sales")return "Sales Returns and Allowances is a contra-revenue with a debit balance. It is subtracted from Sales Revenue to get net sales.";
+    if(["opex","othexp","cogs","tax"].includes(ch))return "Returns and allowances reduce revenue. They are not a cost of running the business, so they are deducted from sales at the top of the statement.";
+    return "Sales Returns and Allowances reduces revenue, so it can't be added as revenue. It is subtracted from Sales Revenue.";
+  }
+  if(s==="oprev"){
+    if(ch==="sales")return "The top line is for sales of guides, so gross profit compares guide sales with guide costs. Consulting has no cost of goods sold, so its revenue is added after gross profit.";
+    if(ch==="othrev")return "Consulting is one of Problem Solvers' main businesses, so its revenue is operating revenue, included before income from operations.";
+    return "Service Revenue is revenue, so it can't go in an expense section.";
+  }
+  if(s==="othrev"){
+    if(ch==="sales"||ch==="oprev")return "Problem Solvers is in the consulting and guide business, not lending. Interest earned is nonoperating, so it is reported after income from operations.";
+    return "Interest Revenue is revenue, so it can't go in an expense section.";
+  }
+  if(s==="othexp"){
+    if(ch==="opex")return "Interest is the cost of borrowing (financing), not of operating the business. It goes in other expense, below income from operations.";
+    if(ch==="tax")return "Only Income Tax Expense goes on the income tax line. Interest is a cost of borrowing.";
+    if(REVSEC.includes(ch))return "Interest Expense is an expense, so it can't go in a revenue section.";
+    return "Interest is a financing cost, not part of selling guides or running operations. It is reported below income from operations.";
+  }
+  if(s==="tax"){
+    if(ch==="opex"||ch==="othexp")return "Income Tax Expense gets its own line after income before income tax expense, because it is based on all the income above it.";
+    if(REVSEC.includes(ch))return "Income Tax Expense is an expense, so it can't go in a revenue section.";
+    return "Income Tax Expense is reported last, on its own line, because it is based on all the income above it.";
+  }
+  return "Not quite. Ask whether "+n+" is a revenue or an expense, and whether it comes from the company's main operations.";
+}
+
+// ---------- state ----------
+let V=null, seed=0, cur=0, st=[], confirmReset=false;
+function blank(){return {vals:{},fb:null,tries:0,revealed:false,hint:false,status:null};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({seed,cur,year:YEAR,st:st.map(s=>({vals:s.vals,tries:s.tries,revealed:s.revealed,status:s.status}))}));}catch(e){}}
+function buildSet(sd){seed=sd;V=gen(sd);$("setNo").textContent="#"+sd;st=PARTS.map(blank);cur=0;}
+function load(){
+  let o=null; try{o=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){}
+  if(o&&o.year!==YEAR)o=null;
+  let hs=null; try{const m=/^#set(\d{1,9})$/.exec(location.hash||"");if(m)hs=+m[1];}catch(e){}
+  if(hs&&(!o||o.seed!==hs)){buildSet(hs);return;}
+  if(o&&o.seed){try{buildSet(o.seed);if(Array.isArray(o.st)&&o.st.length===PARTS.length)o.st.forEach((x,i)=>{Object.assign(st[i],x);if(x.status&&!x.revealed)st[i].fb=grade(i);});cur=Math.max(0,Math.min(PARTS.length-1,o.cur|0));while(cur>0&&!st[cur-1].status)cur--;return;}catch(e){}}
+  buildSet(randomSeed());
+}
+const unlocked=i=>i===0||!!st[i-1].status;
+
+// ---------- grading ----------
+function grade(i){
+  const s=st[i], res={}; let all=true, wrong=0, blankN=0;
+  const mark=(id,ok,msg)=>{res[id]={ok,msg};if(!ok){all=false;if(msg==="__blank")blankN++;else wrong++;}};
+  if(i===0){ACCTS.forEach(a=>{const c=s.vals[a.id];if(!c)mark(a.id,false,"__blank");else if(c===a.st)mark(a.id,true,"");else mark(a.id,false,p1msg(a,c));});}
+  else if(i===1){IS_ACCTS.forEach(a=>{const c=s.vals[a.id];if(!c)mark(a.id,false,"__blank");else if(c===a.sec)mark(a.id,true,"");else mark(a.id,false,p2msg(a,c));});}
+  else if(i===2){
+    const used={}; SLOTS.forEach(x=>{const c=s.vals[x.id];if(c)used[c]=(used[c]||0)+1;});
+    SLOTS.forEach(x=>{const c=s.vals[x.id];
+      if(!c)mark(x.id,false,"__blank");
+      else if(c===x.ans)mark(x.id,true,"");
+      else if(c==="Total revenues"||c==="Total expenses")mark(x.id,false,"A multi-step statement doesn't total all revenues or all expenses. It builds subtotals step by step. "+x.desc);
+      else mark(x.id,false,(used[c]>1?"“"+c+"” is used on more than one line. ":"")+x.desc);});
+  }
+  else {PARTS[3].qs.forEach(q=>{const c=s.vals[q.id];if(!c)mark(q.id,false,"__blank");else if(c===q.ans)mark(q.id,true,"");else mark(q.id,false,q.wrong[c]||"Not quite.");});}
+  Object.values(res).forEach(x=>{if(x.msg==="__blank")x.msg="Make a choice.";});
+  return {res,all,wrong,blankN};
+}
+function answers(i){
+  const v={};
+  if(i===0)ACCTS.forEach(a=>v[a.id]=a.st);
+  else if(i===1)IS_ACCTS.forEach(a=>v[a.id]=a.sec);
+  else if(i===2)SLOTS.forEach(x=>v[x.id]=x.ans);
+  else PARTS[3].qs.forEach(q=>v[q.id]=q.ans);
+  return v;
+}
+
+// ---------- timeline ----------
+const SLAB={first:"correct on first try",retry:"correct after retrying",shown:"answer shown"};
+function renderBar(){
+  $("timeline").innerHTML=PARTS.map((p,i)=>(i?'<span class="tl-arrow" aria-hidden="true">›</span>':'')+'<button class="tick'+(st[i].status?" done s-"+st[i].status:"")+(i===cur?" cur":"")+'" data-i="'+i+'"'+(unlocked(i)?"":" disabled")+' title="'+esc(p.title)+(st[i].status?" ("+SLAB[st[i].status]+")":unlocked(i)?"":" (finish the previous part first)")+'"><span class="n">'+(i+1)+'</span>'+p.tick+'</button>').join("");
+  const n=st.filter(s=>s.status).length, first=st.filter(s=>s.status==="first").length;
+  $("where").innerHTML='<b>'+n+' of '+PARTS.length+'</b> parts finished · now on '+esc(PARTS[cur].title);
+  const sc=$("score"); sc.hidden=n===0; sc.textContent="First-try correct: "+first+" of "+n;
+}
+$("timeline").addEventListener("click",e=>{const t=e.target.closest(".tick");if(t&&!t.disabled){cur=+t.dataset.i;confirmReset=false;render();scrollTo("pPart");}});
+
+// ---------- part card ----------
+function controls(primary){
+  let nav;
+  if(confirmReset)nav='<span class="ask">Start over with:</span><button class="btn small" data-act="resetNew">New problem set</button><button class="btn small" data-act="resetSame">Same numbers</button><button class="btn small" data-act="cancelReset">Cancel</button>';
+  else nav='<button class="btn small" data-act="back"'+(cur===0?" disabled":"")+'>← Back</button><button class="btn small" data-act="reset">⟲ Start over</button>';
+  return '<div class="actions"><div class="grp">'+nav+'</div><div class="grp">'+primary+'</div></div>';
+}
+function countItems(i){return i===0?ACCTS.length:i===1?IS_ACCTS.length:i===2?SLOTS.length:PARTS[3].qs.length;}
+function renderPart(){
+  const p=PARTS[cur], s=st[cur], lock=!!s.status, total=countItems(cur), chosen=Object.values(s.vals).filter(Boolean).length;
+  let h='<div class="meta"><span class="pill">Part '+(cur+1)+' of '+PARTS.length+'</span></div><h3 class="part-title">'+esc(p.title)+'</h3><p class="part-desc">'+esc(p.desc)+'</p>';
+  if(p.where&&!lock)h+='<div class="where">'+esc(p.where)+'</div>';
+  if(p.qs){
+    h+='<div class="fields">';
+    p.qs.forEach(q=>{const r=s.fb&&s.fb.res[q.id], cls=s.revealed?"":r?(r.ok?" ok":" no"):"";
+      h+='<div class="field'+cls+'"><label class="flabel" for="f-'+q.id+'">'+esc(q.label)+'</label><select id="f-'+q.id+'" data-q="'+q.id+'"'+(lock?" disabled":"")+'><option value="">Choose…</option>'+q.opts.map(o=>'<option value="'+o[0]+'"'+(s.vals[q.id]===o[0]?" selected":"")+'>'+esc(o[1])+'</option>').join("")+'</select>'+
+        (r&&!s.revealed?'<div class="fmsg '+(r.ok?"ok":"no")+'"><span>'+(r.ok?"✓":"✗")+'</span><span>'+esc(r.ok?"Correct.":r.msg)+'</span></div>':'')+'</div>';});
+    h+='</div>';
+  } else if(!lock) h+='<div class="progress"><b>'+chosen+' of '+total+'</b> '+(cur===2?"subtotals named":"accounts chosen")+'</div>';
+  if(s.revealed)h+='<div class="overall shown"><b>Answers shown.</b> '+(p.qs?"Read each answer, then try a new problem set on your own.":"Study the correct choices, then try a new problem set on your own.")+'</div>';
+  else if(s.fb){
+    if(s.fb.all)h+='<div class="overall ok"><b>✓ '+(s.tries===1?"All correct on the first try.":"All correct after "+s.tries+" tries.")+'</b></div>';
+    else{const parts=[];if(s.fb.wrong)parts.push(s.fb.wrong+" "+(s.fb.wrong===1?"needs":"need")+" another look");if(s.fb.blankN)parts.push(s.fb.blankN+" "+(s.fb.blankN===1?"is":"are")+" still blank");
+      h+='<div class="overall no"><b>Not quite yet.</b> '+esc(parts.join(" and "))+'. Each ✗ explains why.</div>';}
+  }
+  if(lock)h+='<div class="why"><b>Why it matters</b><br>'+esc(p.why)+'</div>';
+  if(s.hint&&!lock)h+='<div class="hintbox"><b>Hint</b>'+p.hint+'</div>';
+  let prim;
+  const allDone=st.every(x=>x.status);
+  if(lock)prim=cur<PARTS.length-1?'<button class="btn primary" data-act="next">Next part →</button>':'<button class="btn primary" data-act="resetNew">New problem set →</button>';
+  else prim=(!s.hint?'<button class="btn small" data-act="hint">Show a hint</button>':'')+'<button class="btn small" data-act="show">Show the answer</button><button class="btn primary" data-act="check">Check my answers</button>';
+  if(allDone&&cur===PARTS.length-1){const c=x=>st.filter(v=>v.status===x).length;
+    h+='<div class="effects"><span class="eff up">First try '+c("first")+'</span><span class="eff none">Retried '+c("retry")+'</span><span class="eff none">Answer shown '+c("shown")+'</span></div>';}
+  $("part").innerHTML=h+controls(prim);
+  $("partSub").textContent=lock?(s.revealed?"Answers shown":"Complete"):"In progress";
+}
+$("part").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]"); if(!b||b.disabled)return;
+  const act=b.dataset.act, s=st[cur];
+  if(act==="check"){s.tries++;s.fb=grade(cur);if(s.fb.all)s.status=s.tries===1?"first":"retry";else if(s.tries>=2)s.hint=true;render();
+    if(!s.fb.all){const bad=document.querySelector("tr.no select,.field.no select");if(bad){bad.focus({preventScroll:true});bad.scrollIntoView({block:"center",behavior:"smooth"});}}else focusAct("next");}
+  else if(act==="hint"){s.hint=true;renderPart();}
+  else if(act==="show"){s.revealed=true;s.status="shown";s.vals=answers(cur);s.fb=null;render();focusAct("next");}
+  else if(act==="next"){cur++;render();scrollTo("pPart");}
+  else if(act==="back"){cur--;render();scrollTo("pPart");}
+  else if(act==="reset"){confirmReset=true;renderPart();}
+  else if(act==="cancelReset"){confirmReset=false;renderPart();}
+  else if(act==="resetSame"){confirmReset=false;st=PARTS.map(blank);cur=0;render();scrollTo("pPart");}
+  else if(act==="resetNew"){confirmReset=false;let sd=randomSeed();if(sd===seed)sd++;buildSet(sd);render();scrollTo("pPart");}
+});
+$("part").addEventListener("change",e=>{const q=e.target.dataset.q;if(!q)return;const s=st[cur];s.vals[q]=e.target.value;if(s.fb&&s.fb.res[q]){delete s.fb.res[q];}renderPart();save();});
+function focusAct(a){const p=$("part").querySelector('[data-act="'+a+'"]');if(p){p.focus({preventScroll:true});return true;}return false;}
+function scrollTo(id){const p=$(id);const r=p.getBoundingClientRect();const top=parseFloat(getComputedStyle(p).scrollMarginTop)||0;if(r.top<top-2||r.top>window.innerHeight*0.6)p.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});}
+
+// ---------- adjusted trial balance ----------
+function renderTB(){
+  const s1=st[0], s2=st[1];
+  const p1Active=cur===0&&!s1.status, p2Show=!!s1.status, p2Active=cur===1&&!s2.status;
+  $("tbSub").textContent=p1Active?"Choose a statement for each account":p2Active?"Choose a section for each income statement account":"December 31, "+YEAR;
+  let D=0,C=0;
+  let h='<div class="scroll"><table class="tb"><caption><div class="cap-firm">Problem Solvers, Inc.</div><div class="cap-name">Adjusted Trial Balance</div><div class="cap-date">December 31, '+YEAR+'</div></caption>'+
+    '<thead><tr><th>No.</th><th>Account</th><th class="r">Debit</th><th class="r">Credit</th><th>Statement</th>'+(p2Show?'<th>Section</th>':'')+'</tr></thead><tbody>';
+  ACCTS.forEach(a=>{
+    const amt=V[a.id]; if(a.side==="D")D+=amt; else C+=amt;
+    const f1=s1.fb&&s1.fb.res[a.id], f2=s2.fb&&s2.fb.res[a.id];
+    const f=p1Active?f1:p2Active?f2:null;
+    let c1,c2="";
+    if(p1Active)c1='<select data-p="0" data-id="'+a.id+'" aria-label="Statement for '+esc(a.name)+'"><option value="">Choose…</option>'+STMTS.map(o=>'<option value="'+o[0]+'"'+(s1.vals[a.id]===o[0]?" selected":"")+'>'+o[2]+'</option>').join("")+'</select>';
+    else if(s1.status)c1='<span class="tag '+a.st+'">'+(a.st==="SRE"?"Retained earnings":a.st==="IS"?"Income stmt":"Balance sheet")+'</span>';
+    else c1='<span class="dim">'+(s1.vals[a.id]?STMTS.find(o=>o[0]===s1.vals[a.id])[1]:"—")+'</span>';
+    if(p2Show){
+      if(a.st!=="IS")c2='<span class="dim">—</span>';
+      else if(p2Active)c2='<select data-p="1" data-id="'+a.id+'" aria-label="Section for '+esc(a.name)+'"><option value="">Choose…</option>'+SECS.map(o=>'<option value="'+o[0]+'"'+(s2.vals[a.id]===o[0]?" selected":"")+'>'+o[1]+'</option>').join("")+'</select>';
+      else if(s2.status)c2='<span class="tag sec">'+SECNAME[a.sec]+'</span>';
+      else c2='<span class="dim">'+(s2.vals[a.id]?SECNAME[s2.vals[a.id]]:"Not placed yet")+'</span>';
+    }
+    h+='<tr class="'+(f?(f.ok?"ok":"no"):"")+'"><td class="no">'+a.no+'</td><td class="nm">'+esc(a.name)+'</td><td class="r">'+(a.side==="D"?fmt(amt):"")+'</td><td class="r">'+(a.side==="C"?fmt(amt):"")+'</td><td class="pick">'+c1+'</td>'+(p2Show?'<td class="pick2">'+c2+'</td>':'')+'</tr>';
+    if(f&&!f.ok)h+='<tr class="fb"><td></td><td colspan="'+(p2Show?5:4)+'"><div class="fmsg no"><span>✗</span><span>'+esc(f.msg)+'</span></div></td></tr>';
+  });
+  h+='</tbody><tfoot><tr><td></td><td>Totals</td><td class="r">'+money(D,true)+'</td><td class="r">'+money(C,true)+'</td><td></td>'+(p2Show?'<td></td>':'')+'</tr></tfoot></table></div>';
+  h+='<div class="tb-note">'+(D===C?'<span class="balanced">✓ Debits equal credits.</span> ':'')+'Retained Earnings has no balance yet because this is the company\'s first year.</div>';
+  $("tb").innerHTML=h;
+  $("pTB").classList.toggle("focus",p1Active||p2Active);
+}
+$("tb").addEventListener("change",e=>{
+  const el=e.target; if(!el.dataset||el.dataset.p==null)return;
+  const i=+el.dataset.p, s=st[i]; s.vals[el.dataset.id]=el.value;
+  if(s.fb&&s.fb.res[el.dataset.id]){delete s.fb.res[el.dataset.id];const tr=el.closest("tr");tr.className="";const nx=tr.nextElementSibling;if(nx&&nx.classList.contains("fb"))nx.remove();}
+  if(i===1)renderStatement();
+  renderPart();save();
+});
+
+// ---------- income statement ----------
+function placements(){
+  if(!st[0].status)return null;
+  if(st[1].status)return Object.fromEntries(IS_ACCTS.map(a=>[a.id,a.sec]));
+  return Object.assign({},st[1].vals);
+}
+function renderStatement(){
+  const pl=placements();
+  $("pSt").classList.toggle("focus",cur===2&&!st[2].status);
+  if(!pl){$("statement").innerHTML='<div class="st-wait">Your income statement builds here once you finish Part 1 and start placing accounts in Part 2.</div>';return;}
+  const by={}; SECS.forEach(([k])=>by[k]=[]);
+  IS_ACCTS.forEach(a=>{const k=pl[a.id];if(k&&by[k])by[k].push(a);});
+  const sum=k=>by[k].reduce((t,a)=>t+V[a.id],0);
+  const ns=sum("sales")-sum("contra"), gp=ns-sum("cogs"), io=gp+sum("oprev")-sum("opex"), oth=sum("othrev")-sum("othexp"), ibt=io+oth, ni=ibt-sum("tax");
+  const s3=st[2], slotActive=cur===2&&!s3.status, labelsKnown=!!s3.status;
+  const R=(label,c1,c2,o)=>{o=o||{};return '<tr class="'+(o.cls||"")+'"><td class="'+(o.i?"i"+o.i:"")+(o.lm?" lab-muted":"")+'">'+label+'</td><td class="n '+(o.u1||"")+'">'+(c1==null?"":c1)+'</td><td class="n '+(o.u2||"")+'">'+(c2==null?"":c2)+'</td></tr>';};
+  const list=(k,indent,col,neg)=>{const xs=by[k];if(!xs.length)return R("No accounts placed here yet",null,null,{cls:"empty",i:indent});
+    return xs.map((a,j)=>col===1?R(esc(a.name),money(neg?-V[a.id]:V[a.id]),null,{i:indent,u1:j===xs.length-1?"ul":""}):R(esc(a.name),null,money(V[a.id]),{i:indent})).join("");};
+  const slot=(id,amt,u2)=>{
+    const x=SLOTS.find(z=>z.id===id), r=s3.fb&&s3.fb.res[id];
+    if(slotActive){
+      const sel='<select data-slot="'+id+'" aria-label="Name for subtotal"><option value="">Name this subtotal…</option>'+LABELS.map(l=>'<option'+(s3.vals[id]===l?" selected":"")+'>'+l+'</option>').join("")+'</select>';
+      return '<tr class="sub slot'+(r?(r.ok?" ok":" no"):"")+'"><td>'+sel+'</td><td class="n"></td><td class="n '+(u2||"")+'">'+money(amt,true)+'</td></tr>'+
+        (r&&!r.ok?'<tr class="fb"><td colspan="3"><div class="fmsg no"><span>✗</span><span>'+esc(r.msg)+'</span></div></td></tr>':'');
+    }
+    if(labelsKnown)return R(x.ans,null,money(amt,true),{cls:"sub",u2:u2});
+    return R("Subtotal",null,money(amt,true),{cls:"sub",u2:u2,lm:1});
+  };
+  let h='<table class="st"><caption><div class="cap-firm">Problem Solvers, Inc.</div><div class="cap-name">Income Statement</div><div class="cap-date">For the Year Ended December 31, '+YEAR+'</div></caption>';
+  // sales and deductions
+  const sales=by.sales, contra=by.contra;
+  if(sales.length)sales.forEach(a=>{h+=R(esc(a.name),money(V[a.id],true),null);}); else h+=R("Sales: no account placed yet",null,null,{cls:"empty"});
+  if(contra.length)contra.forEach((a,j)=>{h+=R("Less: "+esc(a.name),fmt(V[a.id]),null,{i:1,u1:j===contra.length-1?"ul":""});}); else h+=R("Deduction from sales: none placed yet",null,null,{cls:"empty",i:1});
+  h+=slot("ns",ns);
+  if(by.cogs.length)by.cogs.forEach(a=>{h+=R(esc(a.name),null,fmt(V[a.id]),{u2:"ul"});}); else h+=R("Cost of goods sold: none placed yet",null,null,{cls:"empty"});
+  h+=slot("gp",gp);
+  if(by.oprev.length)by.oprev.forEach((a,j)=>{h+=R("Add: "+esc(a.name),null,fmt(V[a.id]));}); else h+=R("Other operating revenue: none placed yet",null,null,{cls:"empty"});
+  h+=R("Operating expenses",null,null,{cls:"h"});
+  h+=list("opex",1,1);
+  h+=R("Total operating expenses",null,money(-sum("opex")),{i:2,u2:"ul"});
+  h+=slot("io",io);
+  h+=R("Other revenue and (expense)",null,null,{cls:"h"});
+  const othRows=by.othrev.map(a=>R(esc(a.name),money(V[a.id]),null,{i:1})).concat(by.othexp.map(a=>R(esc(a.name),money(-V[a.id]),null,{i:1})));
+  if(othRows.length){othRows[othRows.length-1]=othRows[othRows.length-1].replace('class="n "','class="n ul"');h+=othRows.join("");}
+  else h+=R("No accounts placed here yet",null,null,{cls:"empty",i:1});
+  h+=R("Total other revenue and (expense)",null,money(oth),{i:2,u2:"ul"});
+  h+=slot("ibt",ibt);
+  if(by.tax.length)by.tax.forEach(a=>{h+=R(esc(a.name),null,fmt(V[a.id]),{u2:"ul"});}); else h+=R("Income tax expense: none placed yet",null,null,{cls:"empty"});
+  h+=slot("ni",ni,"dul");
+  h+='</table>';
+  const unplaced=IS_ACCTS.filter(a=>!pl[a.id]).length;
+  if(unplaced&&!st[1].status)h+='<div class="st-note">'+unplaced+' income statement '+(unplaced===1?"account is":"accounts are")+' not placed yet.</div>';
+  else if(st[1].status&&!st[2].status&&cur!==2)h+='<div class="st-note">Every account is in place. Next, name the five subtotals in Part 3.</div>';
+  else if(st[2].status)h+='<div class="st-note">Read it top to bottom: net sales → gross profit → income from operations → income before income tax expense → net income.</div>';
+  $("statement").innerHTML=h;
+}
+$("statement").addEventListener("change",e=>{const id=e.target.dataset.slot;if(!id)return;const s=st[2];s.vals[id]=e.target.value;if(s.fb&&s.fb.res[id])delete s.fb.res[id];renderStatement();renderPart();save();});
+
+function render(){renderBar();renderPart();renderTB();renderStatement();save();}
+function measure(){const r=document.documentElement;r.style.setProperty("--b1",$("band1").offsetHeight+"px");r.style.setProperty("--b2",$("band2").offsetHeight+"px");}
+try{new ResizeObserver(measure).observe($("band1"));new ResizeObserver(measure).observe($("band2"));}catch(e){window.addEventListener("resize",measure);}
+measure();
+
+window.__lab={gen,ACCTS};
+load();
+render();
+})();
+</script>
+</body>
+</html>
